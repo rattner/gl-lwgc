@@ -87,7 +87,7 @@ parser.add_argument('--small_batch_size', type=int, default=-1,
                      until batch_size is reached. An update step is then performed.')
 parser.add_argument('--max_seq_len_delta', type=int, default=40,
                     help='max sequence length')
-parser.add_argument('--single_gpu', default=True, action='store_true',
+parser.add_argument('--single_gpu', action='store_true',
                     help='use single GPU')
 parser.add_argument('--gpu', type=int, default=0,
                     help='set gpu device ID (-1 for cpu)')

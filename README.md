@@ -1,11 +1,13 @@
-# Breaking the Softmax Bottleneck: A High-Rank Language Model
+# Gradual Learning of Recurrent Neural Networks
 
-This is the code we used in our paper
->[Breaking the Softmax Bottleneck: A High-Rank RNN Language Model](https://arxiv.org/abs/1711.03953)
+## Intro
+We present an implementation of the current state-of-the-art algorithm on Penn Treebank and WikiText-2 text prediction curposes.
+Described in the article:
+[Gradual Learning of Recurrent Neural Networks](https://arxiv.org/abs/1708.08863)
 
->Zhilin Yang\*, Zihang Dai\*, Ruslan Salakhutdinov, William W. Cohen (*: equal contribution)
+By Ziv Aharoni, Gal Rattner and Haim Permutter
 
->Preprint 2017
+Preprint 2018
 
 ## Requirements
 
@@ -15,57 +17,28 @@ Python 3.6, PyTorch 0.2.0
 
 ```./get_data.sh```
 
-## Train the models (to reproduce our results)
+## Results reproduction
 
 ### Penn Treebank
 
-First, train the model
+Train the model:
 
-```python main.py --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch_size 12 --lr 20.0 --epoch 1000 --nhid 960 --nhidlast 620 --emsize 280 --n_experts 15  --save PTB --single_gpu```
+```python run-gl-lwgc.py```
 
-Second, finetune the model
+*See run-gl-lwgc.py script for hyper-parameters and configurations.
+Script log files are saved by default under running directory in './GL/Lx/TEST/', the logging path can be changed by setting 'dirs' under general serrings below
 
-```python finetune.py --data data/penn --dropouti 0.4 --dropoutl 0.29 --dropouth 0.225 --seed 28 --batch_size 12 --lr 25.0 --epoch 1000 --nhid 960 --emsize 280 --n_experts 15  --save PATH_TO_FOLDER --single_gpu```
+### Penn Treebank (multi-GPUs)
 
-where `PATH_TO_FOLDER` is the folder created by the first step (concatenation of PTB with a timestamp).
+Set number of GPUs using CUDA_VISIBLE_DEVICES variable:
+ ```CUDA_VISIBLE_DEVICES=0,1,2 ```
 
-Third, run dynamic evaluation
-
-```python dynamiceval.py --model PATH_TO_FOLDER/finetune_model.pt --lamb 0.075```
-
-### WikiText-2 (Single GPU)
-
-First, train the model
-
-```python main.py --epochs 1000 --data data/wikitext-2 --save WT2 --dropouth 0.2 --seed 1882 --n_experts 15 --nhid 1150 --nhidlast 650 --emsize 300 --batch_size 15 --lr 15.0 --dropoutl 0.29 --small_batch_size 5 --max_seq_len_delta 20 --dropouti 0.55 --single_gpu```
-
-Second, finetune the model
-
-```python finetune.py --epochs 1000 --data data/wikitext-2 --save PATH_TO_FOLDER --dropouth 0.2 --seed 1882 --n_experts 15 --nhid 1150 --emsize 300 --batch_size 15 --lr 20.0 --dropoutl 0.29 --small_batch_size 5 --max_seq_len_delta 20 --dropouti 0.55 --single_gpu```
-
-Third, run dynamic evaluation
-
-```python dynamiceval.py --data data/wikitext-2 --model PATH_TO_FOLDER/finetune_model.pt --epsilon 0.002```
-
-### WikiText-2 (3 GPUs)
-
-This will yield the same results as using one single GPU, but will be faster.
-
-First, train the model
-
-```CUDA_VISIBLE_DEVICES=0,1,2 python main.py --epochs 1000 --data data/wikitext-2 --save WT2 --dropouth 0.2 --seed 1882 --n_experts 15 --nhid 1150 --nhidlast 650 --emsize 300 --batch_size 15 --lr 15.0 --dropoutl 0.29 --small_batch_size 15 --max_seq_len_delta 20 --dropouti 0.55```
-
-Second, finetune the model
-
-```CUDA_VISIBLE_DEVICES=0,1,2 python finetune.py --epochs 1000 --data data/wikitext-2 --save PATH_TO_FOLDER --dropouth 0.2 --seed 1882 --n_experts 15 --nhid 1150 --emsize 300 --batch_size 15 --lr 20.0 --dropoutl 0.29 --small_batch_size 15 --max_seq_len_delta 20 --dropouti 0.55```
-
-Third, run dynamic evaluation
-
-```python dynamiceval.py --data data/wikitext-2 --model PATH_TO_FOLDER/finetune_model.pt --epsilon 0.002```
+ then change gpu settings in run-gl-lwgc.py script to a list of gpu numbers (for example 'gpu=0,1,2') and run the script:
+```python run-gl-lwgc.py```
 
 ## Acknowledgements
 
-A large portion of this repo is borrowed from the following repos:
-https://github.com/salesforce/awd-lstm-lm and https://github.com/benkrause/dynamic-evaluation
+Our code is based on the implementation of Zhilin Yang, Zihang Dai et. al., found in the repo:
+https://github.com/zihangdai/mos
 
 
